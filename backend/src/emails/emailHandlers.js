@@ -1,0 +1,24 @@
+import { resendClient, sender } from "../lib/resend.js";
+import { createWelcomeEmailTemplate } from "../emails/emailTemplates.js";
+
+export const sendWelcomeEmail = async (email, name, clientURL) => {
+  // Skip sending email if Resend is not configured
+  if (!resendClient) {
+    console.log("Resend API key not configured. Skipping welcome email.");
+    return;
+  }
+
+  const { data, error } = await resendClient.emails.send({
+    from: `${sender.name} <${sender.email}>`,
+    to: email,
+    subject: "Welcome to Chatify!",
+    html: createWelcomeEmailTemplate(name, clientURL),
+  });
+
+  if (error) {
+    console.error("Error sending welcome email:", error);
+    throw new Error("Failed to send welcome email");
+  }
+
+  console.log("Welcome Email sent successfully", data);
+};
